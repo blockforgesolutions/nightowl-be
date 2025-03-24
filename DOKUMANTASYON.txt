@@ -1,0 +1,501 @@
+NightOwl Backend Projesi Dökümantasyonu
+=======================================
+
+İçindekiler:
+1. Proje Genel Bakış
+2. Proje Yapısı
+3. Veri Tabanı Yapısı (MongoDB)
+4. Modüller
+   4.1. Users (Kullanıcılar) Modülü
+   4.2. Auth (Kimlik Doğrulama) Modülü
+   4.3. Clubs (Kulüpler) Modülü
+   4.4. Events (Etkinlikler) Modülü
+   4.5. Tickets (Biletler) Modülü
+   4.6. Orders (Siparişler) Modülü
+   4.7. Reservations (Rezervasyonlar) Modülü
+5. Kimlik Doğrulama ve Yetkilendirme
+6. Test Yapısı
+7. Ortam Değişkenleri
+8. API Endpoint'leri
+
+----------------------------------------------
+
+1. Proje Genel Bakış
+----------------------------------------------
+NightOwl, gece kulüpleri için bilet satışı ve rezervasyon yapılmasını sağlayan bir platform uygulamasıdır. Bu dokümantasyon, projenin backend kısmını detaylandırmaktadır. Proje, NestJS framework'ü ile geliştirilmiş ve MongoDB veritabanı kullanılarak oluşturulmuştur.
+
+NightOwl backend uygulaması, kullanıcı yönetimi, kimlik doğrulama, kulüp yönetimi, etkinlik yönetimi, bilet satışı ve sipariş yönetimi gibi temel işlevleri desteklemektedir.
+
+2. Proje Yapısı
+----------------------------------------------
+Proje, NestJS'in modüler yapısını takip etmektedir. Her bir özellik kendi modülü içinde kapsüllenmiştir:
+
+/src
+├── app.module.ts         - Ana modül, diğer tüm modülleri bir araya getirir
+├── main.ts               - Uygulama giriş noktası
+├── auth/                 - Kimlik doğrulama ve yetkilendirme ile ilgili dosyalar
+├── users/                - Kullanıcı yönetimi ile ilgili dosyalar
+├── clubs/                - Kulüp yönetimi ile ilgili dosyalar
+├── events/               - Etkinlik yönetimi ile ilgili dosyalar
+├── tickets/              - Bilet yönetimi ile ilgili dosyalar
+└── orders/               - Sipariş yönetimi ile ilgili dosyalar
+
+Her modül genellikle aşağıdaki bileşenleri içerir:
+- Module (*.module.ts): Modülün ana yapılandırma dosyası
+- Controller (*.controller.ts): HTTP isteklerini işleyen sınıf
+- Service (*.service.ts): İş mantığı katmanı
+- DTO (dto/): Veri aktarım nesneleri
+- Schema (schemas/): MongoDB şema tanımları (eski entity klasörü)
+
+3. Veri Tabanı Yapısı (MongoDB)
+----------------------------------------------
+Proje, MongoDB NoSQL veritabanını kullanmaktadır. Önceden TypeORM ve ilişkisel veritabanı kullanılmakta iken, şu anda Mongoose ODM (Object Document Mapper) ile MongoDB'ye geçiş yapılmıştır.
+
+Veritabanı koleksiyonları:
+- users: Kullanıcı bilgileri
+- clubs: Kulüp bilgileri
+- events: Etkinlik bilgileri
+- tickets: Bilet bilgileri
+- orders: Sipariş bilgileri
+- products: Ürün bilgileri (kulüplerin sunduğu ürünler)
+- order-items: Sipariş içerisindeki ürünler
+
+Şema dosyaları (.schema.ts), MongoDB koleksiyonlarının Mongoose ORM aracılığıyla JavaScript/TypeScript nesnelerine nasıl eşleneceğini tanımlar. Her şema, ilgili modül klasörünün altındaki "schemas" dizininde yer alır.
+
+4. Modüller
+----------------------------------------------
+
+4.1. Users (Kullanıcılar) Modülü
+----------------------------------------------
+Dosya Yapısı:
+/src/users/
+├── users.module.ts       - Kullanıcı modülü yapılandırması
+├── users.controller.ts   - Kullanıcı HTTP endpoint'leri
+├── users.service.ts      - Kullanıcı işlemleri mantığı
+├── dto/                  - Veri transfer nesneleri
+│   ├── create-user.dto.ts
+│   └── update-user.dto.ts
+└── schemas/
+    └── user.schema.ts    - Kullanıcı MongoDB şeması
+
+Açıklama:
+- `users.module.ts`: Kullanıcı modülünün yapılandırmasını içerir, MongooseModule ile User şemasını kaydeder.
+- `users.controller.ts`: Kullanıcı yönetimi için HTTP endpoint'lerini tanımlar (CRUD işlemleri).
+- `users.service.ts`: Kullanıcı oluşturma, arama, güncelleme ve silme işlemlerinin mantığını içerir.
+- `dto/`: Kullanıcı oluşturma ve güncelleme için veri doğrulama kurallarını içeren DTO'ları tanımlar.
+- `schemas/user.schema.ts`: Kullanıcı veri modelini, alanlarını ve MongoDB şema yapılandırmasını tanımlar.
+
+User şeması şu alanları içerir:
+- email: Kullanıcı e-posta adresi (benzersiz)
+- firstName: Kullanıcının adı
+- lastName: Kullanıcının soyadı
+- password: Şifre (hashlenerek saklanır)
+- role: Kullanıcı rolü (USER, CLUB_OWNER, ADMIN)
+- phoneNumber: Telefon numarası
+- avatarUrl: Profil resmi URL'si
+- isActive: Hesap aktif mi?
+- orders: Kullanıcının siparişleri (referans ilişkisi)
+- createdAt, updatedAt: Oluşturma ve güncelleme zaman damgaları
+
+4.2. Auth (Kimlik Doğrulama) Modülü
+----------------------------------------------
+Dosya Yapısı:
+/src/auth/
+├── auth.module.ts        - Kimlik doğrulama modülü yapılandırması
+├── auth.controller.ts    - Kimlik doğrulama HTTP endpoint'leri
+├── auth.service.ts       - Kimlik doğrulama işlemleri mantığı
+├── dto/                  - Veri transfer nesneleri
+│   └── login.dto.ts
+├── guards/               - Yetkilendirme muhafızları
+│   ├── jwt-auth.guard.ts
+│   ├── local-auth.guard.ts
+│   └── roles.guard.ts
+├── strategies/           - Passport.js stratejileri
+│   ├── jwt.strategy.ts
+│   └── local.strategy.ts
+└── decorators/          - Özel dekoratörler
+    └── roles.decorator.ts
+
+Açıklama:
+- `auth.module.ts`: Kimlik doğrulama modülünün yapılandırmasını içerir, JWT modülünü yapılandırır.
+- `auth.controller.ts`: Kayıt olma, giriş yapma ve profil alma endpoint'lerini tanımlar.
+- `auth.service.ts`: Kullanıcı doğrulama, JWT token oluşturma ve profil alma işlemlerinin mantığını içerir.
+- `guards/`: Kimlik doğrulama ve yetkilendirme için muhafızları (guard) içerir.
+- `strategies/`: Passport.js stratejilerini (JWT, Local) tanımlar.
+- `decorators/`: Özel dekoratörleri içerir (örn. @Roles).
+
+Bu modül şu işlevleri sağlar:
+- Kullanıcı kaydı ve girişi
+- JWT token oluşturma ve doğrulama
+- Rol tabanlı yetkilendirme (USER, CLUB_OWNER, ADMIN)
+
+4.3. Clubs (Kulüpler) Modülü
+----------------------------------------------
+Dosya Yapısı:
+/src/clubs/
+├── clubs.module.ts       - Kulüp modülü yapılandırması
+├── clubs.controller.ts   - Kulüp HTTP endpoint'leri
+├── clubs.service.ts      - Kulüp işlemleri mantığı
+├── dto/                  - Veri transfer nesneleri
+│   ├── create-club.dto.ts
+│   ├── update-club.dto.ts
+│   └── search-clubs.dto.ts
+└── schemas/
+    └── club.schema.ts    - Kulüp MongoDB şeması
+
+Açıklama:
+- `clubs.module.ts`: Kulüp modülünün yapılandırmasını içerir, MongooseModule ile Club şemasını kaydeder.
+- `clubs.controller.ts`: Kulüp yönetimi için HTTP endpoint'lerini tanımlar (CRUD ve arama işlemleri).
+- `clubs.service.ts`: Kulüp oluşturma, arama, güncelleme ve silme işlemlerinin mantığını içerir.
+- `dto/`: Kulüp oluşturma, güncelleme ve arama için veri doğrulama kurallarını içeren DTO'ları tanımlar.
+- `schemas/club.schema.ts`: Kulüp veri modelini, alanlarını ve MongoDB şema yapılandırmasını tanımlar.
+
+Club şeması şu alanları içerir:
+- name: Kulüp adı
+- description: Kulüp açıklaması
+- address: Adres
+- city: Şehir
+- latitude, longitude: Konum koordinatları
+- capacity: Kapasite
+- coverImageUrl: Kapak resmi URL'si
+- photos: Fotoğraf URL'leri dizisi
+- primaryGenre: Birincil müzik türü
+- genres: Müzik türleri dizisi
+- openingHours: Açılış saatleri (gün-saat eşleşmesi)
+- isActive: Kulüp aktif mi?
+- amenities: Olanaklar/imkanlar dizisi
+- rating: Değerlendirme puanı
+- ratingCount: Değerlendirme sayısı
+- ownerId: Kulüp sahibinin kullanıcı ID'si
+- orders: Kulübe yapılan siparişler
+- products: Kulübün sunduğu ürünler
+- createdAt, updatedAt: Oluşturma ve güncelleme zaman damgaları
+
+Table şeması şu alanları içerir:
+- tableNumber: Masa numarası (benzersiz)
+- capacity: Masa kapasitesi
+- status: Masa durumu (AVAILABLE, RESERVED, OCCUPIED, UNAVAILABLE)
+- type: Masa tipi (STANDARD, VIP, BOOTH, BAR)
+- currentReservationId: Mevcut rezervasyon ID'si
+- currentOrderId: Mevcut sipariş ID'si
+- clubId: Masanın ait olduğu kulübün ID'si
+- locationDescription: Masanın konum açıklaması
+- isActive: Masa aktif mi?
+- createdAt, updatedAt: Oluşturma ve güncelleme zaman damgaları
+
+4.4. Events (Etkinlikler) Modülü
+----------------------------------------------
+Dosya Yapısı:
+/src/events/
+├── events.module.ts      - Etkinlik modülü yapılandırması
+├── events.controller.ts  - Etkinlik HTTP endpoint'leri
+├── events.service.ts     - Etkinlik işlemleri mantığı
+├── dto/                  - Veri transfer nesneleri
+│   ├── create-event.dto.ts
+│   ├── update-event.dto.ts
+│   └── search-events.dto.ts
+└── schemas/
+    └── event.schema.ts   - Etkinlik MongoDB şeması
+
+Açıklama:
+- `events.module.ts`: Etkinlik modülünün yapılandırmasını içerir, MongooseModule ile Event şemasını kaydeder.
+- `events.controller.ts`: Etkinlik yönetimi için HTTP endpoint'lerini tanımlar (CRUD ve arama işlemleri).
+- `events.service.ts`: Etkinlik oluşturma, arama, güncelleme ve silme işlemlerinin mantığını içerir.
+- `dto/`: Etkinlik oluşturma, güncelleme ve arama için veri doğrulama kurallarını içeren DTO'ları tanımlar.
+- `schemas/event.schema.ts`: Etkinlik veri modelini, alanlarını ve MongoDB şema yapılandırmasını tanımlar.
+
+Event şeması şu alanları içerir:
+- name: Etkinlik adı
+- description: Etkinlik açıklaması
+- startDate: Başlangıç tarihi ve saati
+- endDate: Bitiş tarihi ve saati
+- ticketPrice: Bilet fiyatı
+- coverImageUrl: Kapak resmi URL'si
+- genre: Müzik türü
+- status: Etkinlik durumu (UPCOMING, ONGOING, COMPLETED, CANCELLED)
+- totalTickets: Toplam bilet sayısı
+- soldTickets: Satılan bilet sayısı
+- clubId: Etkinliğin yapılacağı kulübün ID'si
+- isActive: Etkinlik aktif mi?
+- createdAt, updatedAt: Oluşturma ve güncelleme zaman damgaları
+
+4.5. Tickets (Biletler) Modülü
+----------------------------------------------
+Dosya Yapısı:
+/src/tickets/
+├── tickets.module.ts     - Bilet modülü yapılandırması
+├── tickets.controller.ts - Bilet HTTP endpoint'leri
+├── tickets.service.ts    - Bilet işlemleri mantığı
+├── dto/                  - Veri transfer nesneleri
+│   ├── create-ticket.dto.ts
+│   ├── update-ticket.dto.ts
+│   └── verify-ticket.dto.ts
+└── schemas/
+    └── ticket.schema.ts  - Bilet MongoDB şeması
+
+Açıklama:
+- `tickets.module.ts`: Bilet modülünün yapılandırmasını içerir, MongooseModule ile Ticket şemasını kaydeder.
+- `tickets.controller.ts`: Bilet yönetimi için HTTP endpoint'lerini tanımlar (CRUD, doğrulama ve QR kodu işlemleri).
+- `tickets.service.ts`: Bilet oluşturma, arama, güncelleme, doğrulama ve QR kodu oluşturma işlemlerinin mantığını içerir.
+- `dto/`: Bilet oluşturma, güncelleme ve doğrulama için veri doğrulama kurallarını içeren DTO'ları tanımlar.
+- `schemas/ticket.schema.ts`: Bilet veri modelini, alanlarını ve MongoDB şema yapılandırmasını tanımlar.
+
+Ticket şeması şu alanları içerir:
+- ticketCode: Bilet kodu (benzersiz)
+- status: Bilet durumu (RESERVED, PAID, USED, CANCELLED, EXPIRED)
+- price: Bilet fiyatı
+- paymentIntentId: Ödeme işlemi ID'si
+- isPaid: Ödendi mi?
+- isUsed: Kullanıldı mı?
+- usedAt: Kullanılma tarihi ve saati
+- userId: Bilet sahibinin kullanıcı ID'si
+- eventId: Biletin geçerli olduğu etkinliğin ID'si
+- metadata: Ek bilgiler (JSON formatında)
+- createdAt, updatedAt: Oluşturma ve güncelleme zaman damgaları
+
+4.6. Orders (Siparişler) Modülü
+----------------------------------------------
+Dosya Yapısı:
+/src/orders/
+├── orders.module.ts      - Sipariş modülü yapılandırması
+├── orders.controller.ts  - Sipariş HTTP endpoint'leri
+├── orders.service.ts     - Sipariş işlemleri mantığı
+├── dto/                  - Veri transfer nesneleri
+│   ├── create-order.dto.ts
+│   ├── update-order.dto.ts
+│   ├── create-product.dto.ts
+│   └── update-product.dto.ts
+└── schemas/
+    ├── order.schema.ts   - Sipariş MongoDB şeması
+    ├── order-item.schema.ts - Sipariş öğesi MongoDB şeması
+    └── product.schema.ts - Ürün MongoDB şeması
+
+Açıklama:
+- `orders.module.ts`: Sipariş modülünün yapılandırmasını içerir, MongooseModule ile Order, OrderItem ve Product şemalarını kaydeder.
+- `orders.controller.ts`: Sipariş ve ürün yönetimi için HTTP endpoint'lerini tanımlar (CRUD işlemleri).
+- `orders.service.ts`: Sipariş ve ürün oluşturma, arama, güncelleme ve silme işlemlerinin mantığını içerir.
+- `dto/`: Sipariş ve ürün oluşturma ve güncelleme için veri doğrulama kurallarını içeren DTO'ları tanımlar.
+- `schemas/`: Sipariş, sipariş öğesi ve ürün veri modellerini, alanlarını ve MongoDB şema yapılandırmalarını tanımlar.
+
+Order şeması şu alanları içerir:
+- orderNumber: Sipariş numarası (benzersiz)
+- status: Sipariş durumu (PENDING, PROCESSING, PAID, DELIVERED, CANCELLED)
+- totalAmount: Toplam tutar
+- paymentIntentId: Ödeme işlemi ID'si
+- isPaid: Ödendi mi?
+- userId: Siparişi veren kullanıcının ID'si
+- clubId: Siparişin verildiği kulübün ID'si
+- tableId: Siparişin verildiği masanın ID'si
+- items: Sipariş içerisindeki ürünler (OrderItem referansları)
+- createdAt, updatedAt: Oluşturma ve güncelleme zaman damgaları
+
+OrderItem şeması şu alanları içerir:
+- orderId: Bağlı olduğu siparişin ID'si
+- productId: Ürün ID'si
+- quantity: Miktar
+- price: Birim fiyat
+- productSnapshot: Sipariş oluşturulduğundaki ürün durumunun anlık görüntüsü
+
+Product şeması şu alanları içerir:
+- name: Ürün adı
+- description: Ürün açıklaması
+- price: Ürün fiyatı
+- category: Ürün kategorisi (DRINK, FOOD, VIP, OTHER)
+- imageUrl: Ürün resmi URL'si
+- isAvailable: Ürün mevcut mu?
+- clubId: Ürünün bağlı olduğu kulübün ID'si
+- createdAt, updatedAt: Oluşturma ve güncelleme zaman damgaları
+
+4.7. Reservations (Rezervasyonlar) Modülü
+----------------------------------------------
+Dosya Yapısı:
+/src/reservations/
+├── reservations.module.ts      - Rezervasyon modülü yapılandırması
+├── reservations.controller.ts  - Rezervasyon HTTP endpoint'leri
+├── reservations.service.ts     - Rezervasyon işlemleri mantığı
+├── dto/                        - Veri transfer nesneleri
+│   ├── create-reservation.dto.ts
+│   └── update-reservation.dto.ts
+└── schemas/
+    └── reservation.schema.ts  - Rezervasyon MongoDB şeması
+
+Açıklama:
+- `reservations.module.ts`: Rezervasyon modülünün yapılandırmasını içerir, MongooseModule ile Reservation şemasını kaydeder.
+- `reservations.controller.ts`: Rezervasyon yönetimi için HTTP endpoint'lerini tanımlar (CRUD işlemleri).
+- `reservations.service.ts`: Rezervasyon oluşturma, arama, güncelleme ve silme işlemlerinin mantığını içerir.
+- `dto/`: Rezervasyon oluşturma ve güncelleme için veri doğrulama kurallarını içeren DTO'ları tanımlar.
+- `schemas/reservation.schema.ts`: Rezervasyon veri modelini, alanlarını ve MongoDB şema yapılandırmasını tanımlar.
+
+Reservation şeması şu alanları içerir:
+- reservationCode: Rezervasyon kodu (benzersiz)
+- date: Rezervasyon tarihi
+- time: Rezervasyon saati
+- partySize: Grup büyüklüğü
+- status: Rezervasyon durumu (PENDING, CONFIRMED, CHECKED_IN, COMPLETED, CANCELLED, NO_SHOW)
+- specialRequests: Özel istekler
+- userId: Rezervasyonu yapan kullanıcının ID'si
+- clubId: Rezervasyonun yapıldığı kulübün ID'si
+- tableId: Rezerve edilen masanın ID'si
+- contactPhone: İletişim telefonu
+- contactEmail: İletişim e-postası
+- createdAt, updatedAt: Oluşturma ve güncelleme zaman damgaları
+
+Masa Yönetimi:
+- POST /clubs/:clubId/tables - Yeni masa oluştur (CLUB_OWNER, ADMIN)
+- GET /clubs/:clubId/tables - Kulübe ait tüm masaları listele
+- GET /clubs/:clubId/tables/available - Kulübe ait müsait masaları listele
+- GET /clubs/tables/:tableId - Belirli bir masayı getir
+- PATCH /clubs/tables/:tableId - Masa bilgilerini güncelle (CLUB_OWNER, ADMIN)
+- PATCH /clubs/tables/:tableId/status - Masa durumunu güncelle (CLUB_OWNER, ADMIN)
+- PATCH /clubs/tables/:tableId/assign-order/:orderId - Masaya sipariş ata (CLUB_OWNER, ADMIN)
+- PATCH /clubs/tables/:tableId/remove-order - Masadan siparişi kaldır (CLUB_OWNER, ADMIN)
+- DELETE /clubs/tables/:tableId - Masayı sil (CLUB_OWNER, ADMIN)
+
+Rezervasyon Yönetimi:
+- POST /reservations - Yeni rezervasyon oluştur
+- GET /reservations - Tüm rezervasyonları listele (ADMIN, CLUB_OWNER)
+- GET /reservations/my-reservations - Kullanıcının kendi rezervasyonlarını listele
+- GET /reservations/club/:clubId - Kulübe ait rezervasyonları listele (ADMIN, CLUB_OWNER)
+- GET /reservations/:id - Belirli bir rezervasyonu getir
+- PATCH /reservations/:id - Rezervasyon bilgilerini güncelle
+- PATCH /reservations/:id/status - Rezervasyon durumunu güncelle (ADMIN, CLUB_OWNER)
+- DELETE /reservations/:id - Rezervasyonu sil
+
+5. Kimlik Doğrulama ve Yetkilendirme
+----------------------------------------------
+Proje, JWT (JSON Web Token) tabanlı bir kimlik doğrulama sistemi kullanır. Passport.js kütüphanesi ile entegre edilmiştir.
+
+Kimlik doğrulama süreci:
+1. Kullanıcı kayıt olur veya giriş yapar.
+2. Başarılı giriş yapıldığında, kullanıcıya bir JWT token verilir.
+3. Kullanıcı, sonraki isteklerinde bu token'ı Authorization header'ında taşır.
+4. JwtAuthGuard, token'ın geçerliliğini doğrular.
+5. RolesGuard, kullanıcının istenen role sahip olup olmadığını kontrol eder.
+
+Roller:
+- USER: Standart kullanıcı, bilet satın alabilir ve sipariş verebilir.
+- CLUB_OWNER: Kulüp sahibi, kulüp ve etkinlik yönetimi yapabilir.
+- ADMIN: Yönetici, tüm özelliklere erişebilir.
+
+Güvenlik unsurları:
+- Şifreler bcrypt ile hashlenir.
+- JWT token'ları, bir gizli anahtar (JWT_SECRET) ile imzalanır.
+- Token'lar sınırlı bir süre için geçerlidir (JWT_EXPIRATION).
+- RolesGuard, yetkilendirme için kullanılır.
+
+6. Test Yapısı
+----------------------------------------------
+Proje, Jest test framework'ü ile test edilmektedir. Test dosyaları, ilgili kaynak dosyalarının yanında veya ayrı bir /test dizininde bulunabilir.
+
+Test Dosyaları:
+/test/
+├── app.e2e-spec.ts           - Uygulama e2e testleri
+├── orders.controller.spec.ts - Sipariş controller'ı birim testleri
+├── orders.e2e-spec.ts        - Sipariş e2e testleri
+├── orders.service.spec.ts    - Sipariş service'i birim testleri
+├── jest-e2e.json             - E2E test yapılandırması
+├── mongodb-memory-server.ts  - MongoDB bellek sunucusu yapılandırması
+└── test-setup.ts             - Test kurulum dosyası
+
+Test Ortamı Yapılandırması:
+- `test-setup.ts`: Test öncesi ve sonrası yapılacak işlemleri tanımlar.
+- `mongodb-memory-server.ts`: Testler için geçici MongoDB sunucusu oluşturur.
+- `jest-e2e.json`: E2E testleri için Jest yapılandırması.
+
+Test Türleri:
+- Birim Testleri: Servis ve controller'ların işlevselliğini test eder.
+- E2E Testleri: HTTP endpoint'lerinin uçtan uca işlevselliğini test eder.
+
+Test Komutları:
+- `npm run test`: Tüm birim testlerini çalıştırır.
+- `npm run test:watch`: Birim testlerini izleme modunda çalıştırır.
+- `npm run test:cov`: Test kapsamı raporunu oluşturur.
+- `npm run test:e2e`: E2E testlerini çalıştırır.
+- `npm run test:mongo`: MongoDB bellek sunucusu ile testleri çalıştırır.
+
+7. Ortam Değişkenleri
+----------------------------------------------
+Proje, çeşitli ortam değişkenlerini yapılandırmak için .env dosyalarını kullanır:
+
+.env: Geliştirme ortamı için
+```
+MONGODB_URI=mongodb://localhost:27017/nightowl
+JWT_SECRET=nightowl_jwt_secret_key
+JWT_EXPIRATION=3600s
+PORT=3000
+NODE_ENV=development
+```
+
+.env.test: Test ortamı için
+```
+MONGODB_URI=mongodb://localhost:27017/nightowl_test
+JWT_SECRET=test_jwt_secret_key
+JWT_EXPIRATION=3600s
+PORT=3001
+NODE_ENV=test
+```
+
+Bu değişkenler, @nestjs/config modülü aracılığıyla uygulamada kullanılır.
+
+8. API Endpoint'leri
+----------------------------------------------
+Aşağıda, projenin sunduğu temel API endpoint'lerinin listesi bulunmaktadır:
+
+Kullanıcı Yönetimi:
+- POST /users - Yeni kullanıcı oluştur
+- GET /users - Tüm kullanıcıları listele (Sadece ADMIN)
+- GET /users/:id - Belirli bir kullanıcıyı getir
+- PATCH /users/:id - Kullanıcı bilgilerini güncelle
+- DELETE /users/:id - Kullanıcıyı sil (Sadece ADMIN)
+
+Kimlik Doğrulama:
+- POST /auth/register - Kayıt ol
+- POST /auth/login - Giriş yap
+- GET /auth/profile - Kullanıcı profilini getir
+
+Kulüp Yönetimi:
+- POST /clubs - Yeni kulüp oluştur (CLUB_OWNER, ADMIN)
+- GET /clubs - Tüm kulüpleri listele
+- GET /clubs/search - Kulüpleri ara (Filtreleme desteği)
+- GET /clubs/:id - Belirli bir kulübü getir
+- PATCH /clubs/:id - Kulüp bilgilerini güncelle (Sahibi veya ADMIN)
+- DELETE /clubs/:id - Kulübü sil (Sahibi veya ADMIN)
+
+Etkinlik Yönetimi:
+- POST /events - Yeni etkinlik oluştur (CLUB_OWNER, ADMIN)
+- GET /events - Tüm etkinlikleri listele
+- GET /events/search - Etkinlikleri ara (Filtreleme desteği)
+- GET /events/:id - Belirli bir etkinliği getir
+- PATCH /events/:id - Etkinlik bilgilerini güncelle (Kulüp sahibi veya ADMIN)
+- DELETE /events/:id - Etkinliği sil (Kulüp sahibi veya ADMIN)
+
+Bilet Yönetimi:
+- POST /tickets - Yeni bilet oluştur
+- GET /tickets/admin - Tüm biletleri listele (ADMIN, CLUB_OWNER)
+- GET /tickets/my-tickets - Kullanıcının kendi biletlerini listele
+- GET /tickets/event/:eventId - Etkinliğe ait biletleri listele (ADMIN, CLUB_OWNER)
+- GET /tickets/:id - Belirli bir bileti getir
+- GET /tickets/:id/qr-code - Bilet için QR kodu oluştur
+- POST /tickets/verify - Bileti doğrula (ADMIN, CLUB_OWNER)
+- PATCH /tickets/:id/mark-used - Bileti kullanıldı olarak işaretle (ADMIN, CLUB_OWNER)
+- PATCH /tickets/:id - Bilet bilgilerini güncelle
+- DELETE /tickets/:id - Bileti sil (Sadece ADMIN)
+
+Sipariş Yönetimi:
+- POST /orders - Yeni sipariş oluştur
+- GET /orders - Tüm siparişleri listele (ADMIN, CLUB_OWNER)
+- GET /orders/my-orders - Kullanıcının kendi siparişlerini listele
+- GET /orders/:id - Belirli bir siparişi getir
+- PATCH /orders/:id - Sipariş bilgilerini güncelle
+- PATCH /orders/:id/status - Sipariş durumunu güncelle (ADMIN, CLUB_OWNER)
+- DELETE /orders/:id - Siparişi sil (ADMIN)
+
+Ürün Yönetimi:
+- POST /orders/products - Yeni ürün oluştur (CLUB_OWNER, ADMIN)
+- GET /orders/products - Tüm ürünleri listele
+- GET /orders/products/club/:clubId - Kulübe ait ürünleri listele
+- GET /orders/products/:id - Belirli bir ürünü getir
+- PATCH /orders/products/:id - Ürün bilgilerini güncelle (Kulüp sahibi veya ADMIN)
+- DELETE /orders/products/:id - Ürünü sil (Kulüp sahibi veya ADMIN)
+
+Her bir endpoint, ilgili controller dosyasında tanımlanmış olup, gerekli guard ve dekoratörlerle korunmaktadır. 

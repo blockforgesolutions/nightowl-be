@@ -97,3 +97,77 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+# NightOwl API
+
+## MongoDB ile Testler
+
+Bu projede MongoDB veritabanı kullanılmaktadır. Testleri çalıştırmak için aşağıdaki adımları izleyebilirsiniz.
+
+### Gerekli Paketlerin Kurulumu
+
+```bash
+npm install
+```
+
+### Test Komutları
+
+1. **Tüm Birim Testlerini Çalıştırmak**:
+
+```bash
+npm run test
+```
+
+2. **Sipariş Modülü Testlerini Çalıştırmak**:
+
+```bash
+npm run test:orders
+```
+
+3. **MongoDB Bellek Sunucusu ile Testleri Çalıştırmak**:
+
+```bash
+npm run test:mongo
+```
+
+4. **E2E Testlerini Çalıştırmak**:
+
+```bash
+npm run test:e2e
+```
+
+5. **Tüm Testleri Çalıştırmak**:
+
+```bash
+npm run test:all
+```
+
+### Test Yapısı
+
+- `test/orders.service.spec.ts`: OrdersService birim testleri
+- `test/orders.controller.spec.ts`: OrdersController birim testleri
+- `test/orders.e2e-spec.ts`: Orders API uçtan uca testleri
+- `test/mongodb-memory-server.ts`: Test için bellek içi MongoDB sunucusu
+
+### Test Ortamı
+
+Testler, gerçek bir MongoDB veritabanı kurulumuna ihtiyaç duymadan çalıştırılabilir. `mongodb-memory-server` paketi sayesinde testler için geçici bir bellek içi MongoDB sunucusu oluşturulur.
+
+### Test Özellikleri
+
+1. **Birim Testleri**: Servislerin ve kontrolörlerin işlevlerini doğru şekilde yerine getirdiğini kontrol eder
+2. **E2E Testleri**: API uçlarının beklenen şekilde çalıştığını doğrular
+
+## Postman İle Test
+
+API'yi Postman ile test etmek için:
+
+1. Postman'i indirin ve kurun
+2. Yeni koleksiyon oluşturun "NightOwl API Tests"
+3. API endpointleri için istekler oluşturun:
+
+Örnek istekler:
+- `POST /api/auth/register` - Yeni kullanıcı kaydı
+- `POST /api/auth/login` - Kullanıcı girişi
+- `GET /api/orders/products` - Ürünleri listeleme
+- `POST /api/orders` - Sipariş oluşturma
