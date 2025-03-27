@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsEnum, IsArray, IsNumber, Min, Max } from 'class-validator';
-import { MusicGenre } from '../entities/club.entity';
+import { MusicGenre } from '../schemas/club.schema';
 import { Type } from 'class-transformer';
 
 export class SearchClubsDto {

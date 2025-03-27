@@ -1,5 +1,5 @@
 import { IsOptional, IsEnum, IsBoolean, IsString, IsDate } from 'class-validator';
-import { TicketStatus } from '../entities/ticket.entity';
+import { TicketStatus } from '../schemas/ticket.schema';
 import { Type } from 'class-transformer';
 
 export class UpdateTicketDto {

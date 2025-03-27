@@ -1,6 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsEnum, IsDateString, Min, IsBoolean } from 'class-validator';
-import { MusicGenre } from '../../clubs/entities/club.entity';
-import { EventStatus } from '../entities/event.entity';
+import { MusicGenre } from '../../clubs/schemas/club.schema';
+import { EventStatus } from '../schemas/event.schema';
 
 export class UpdateEventDto {
   @IsString()

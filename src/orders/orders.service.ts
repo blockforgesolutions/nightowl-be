@@ -96,7 +96,7 @@ export class OrdersService {
     if (createOrderDto.tableId) {
       await this.clubsService.assignOrderToTable(
         createOrderDto.tableId,
-        createdOrder._id.toString()
+        createdOrder._id ? createdOrder._id.toString() : createdOrder.id.toString()
       );
     }
     
@@ -152,8 +152,8 @@ export class OrdersService {
       order.status = updateOrderDto.status;
     }
     
-    if (updateOrderDto.notes !== undefined) {
-      order.notes = updateOrderDto.notes;
+    if (updateOrderDto.notes !== undefined && 'notes' in order) {
+      (order as any).notes = updateOrderDto.notes;
     }
     
     await order.save();

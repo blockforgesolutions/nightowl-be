@@ -1,6 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsEnum, IsArray, IsBoolean, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { MusicGenre } from '../entities/club.entity';
+import { MusicGenre } from '../schemas/club.schema';
 
 class OpeningHoursDto {
   @IsString()

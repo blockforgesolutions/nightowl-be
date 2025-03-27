@@ -39,7 +39,7 @@ export class ReservationsController {
   @Get('my-reservations')
   @UseGuards(JwtAuthGuard)
   async findMyReservations(@Request() req) {
-    return this.reservationsService.findAll(null, req.user.userId);
+    return this.reservationsService.findAll(undefined, req.user.userId);
   }
 
   @Get('club/:clubId')

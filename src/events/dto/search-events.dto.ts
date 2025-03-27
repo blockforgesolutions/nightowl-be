@@ -1,7 +1,7 @@
 import { IsString, IsOptional, IsEnum, IsBoolean, IsDateString, IsNumber, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import { MusicGenre } from '../../clubs/entities/club.entity';
-import { EventStatus } from '../entities/event.entity';
+import { MusicGenre } from '../../clubs/schemas/club.schema';
+import { EventStatus } from '../schemas/event.schema';
 
 export class SearchEventsDto {
   @IsString()

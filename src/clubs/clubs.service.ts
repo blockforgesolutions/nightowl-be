@@ -259,7 +259,7 @@ export class ClubsService {
       ? TableStatus.RESERVED 
       : TableStatus.AVAILABLE;
 
-    return this.tableModel.findByIdAndUpdate(
+    const updatedTable = await this.tableModel.findByIdAndUpdate(
       tableId,
       { 
         currentOrderId: null,
@@ -267,6 +267,12 @@ export class ClubsService {
       },
       { new: true }
     );
+    
+    if (!updatedTable) {
+      throw new NotFoundException(`${tableId} ID'li masa bulunamadı`);
+    }
+    
+    return updatedTable;
   }
 
   async deleteTable(tableId: string): Promise<{ deleted: boolean }> {

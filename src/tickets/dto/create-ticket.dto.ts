@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsUUID, IsNumber, IsOptional, IsEnum, Min } from 'class-validator';
-import { TicketStatus } from '../entities/ticket.entity';
+import { TicketStatus } from '../schemas/ticket.schema';
 
 export class CreateTicketDto {
   @IsUUID()

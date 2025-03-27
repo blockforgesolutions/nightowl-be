@@ -61,7 +61,7 @@ export class ReservationsService {
       );
       
       await this.clubsService.updateTable(createReservationDto.tableId, {
-        currentReservationId: newReservation._id.toString()
+        currentReservationId: newReservation._id ? newReservation._id.toString() : newReservation.id.toString()
       });
     }
     
@@ -118,7 +118,7 @@ export class ReservationsService {
       // Eğer mevcut bir masa varsa, serbest bırak
       if (currentTableId) {
         await this.clubsService.updateTableStatus(currentTableId, TableStatus.AVAILABLE);
-        await this.clubsService.updateTable(currentTableId, { currentReservationId: null });
+        await this.clubsService.updateTable(currentTableId, { currentReservationId: '' });
       }
       
       // Yeni masayı rezerve et
@@ -136,7 +136,7 @@ export class ReservationsService {
         currentTableId
       ) {
         await this.clubsService.updateTableStatus(currentTableId, TableStatus.AVAILABLE);
-        await this.clubsService.updateTable(currentTableId, { currentReservationId: null });
+        await this.clubsService.updateTable(currentTableId, { currentReservationId: '' });
       }
     }
     
@@ -146,6 +146,10 @@ export class ReservationsService {
       updateReservationDto,
       { new: true }
     );
+    
+    if (!updatedReservation) {
+      throw new NotFoundException(`${id} ID'li rezervasyon bulunamadı`);
+    }
     
     return updatedReservation;
   }
@@ -166,7 +170,7 @@ export class ReservationsService {
       
       await this.clubsService.updateTable(
         reservation.tableId.toString(),
-        { currentReservationId: null }
+        { currentReservationId: '' }
       );
     }
     
