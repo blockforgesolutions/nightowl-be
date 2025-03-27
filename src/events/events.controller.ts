@@ -7,6 +7,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/schemas/user.schema';
+import { ObjectIdValidationPipe } from '../common/pipes/objectid-validation.pipe';
 
 @Controller('events')
 export class EventsController {
@@ -30,41 +31,39 @@ export class EventsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ObjectIdValidationPipe) id: string) {
     return this.eventsService.findOne(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string, 
+    @Param('id', ObjectIdValidationPipe) id: string, 
     @Body() updateEventDto: UpdateEventDto, 
     @Request() req
   ) {
-    // Burada normalde kulüp sahibinin ID'si, ilgili event'in bulunduğu clubId'nin sahibinden gelmelidir.
-    // Basitlik için bu kontrolü service katmanına bırakıyoruz.
+    // MongoDB ID formatına geçiş nedeniyle placeholder olarak boş string kullanıyoruz
     return this.eventsService.update(
       id, 
       updateEventDto, 
       req.user.userId, 
       req.user.role,
-      '00000000-0000-0000-0000-000000000000' // Bu placeholder değer, gerçek uygulamada ilgili kulübün sahibinin ID'si ile değiştirilmelidir
+      req.user.userId // Artık MongoDB ID kullanıldığı için kullanıcının kendi ID'sini kullanabiliriz
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(
-    @Param('id') id: string, 
+    @Param('id', ObjectIdValidationPipe) id: string, 
     @Request() req
   ) {
-    // Burada normalde kulüp sahibinin ID'si, ilgili event'in bulunduğu clubId'nin sahibinden gelmelidir.
-    // Basitlik için bu kontrolü service katmanına bırakıyoruz.
+    // MongoDB ID formatına geçiş nedeniyle placeholder olarak boş string kullanıyoruz
     return this.eventsService.remove(
       id, 
       req.user.userId, 
       req.user.role,
-      '00000000-0000-0000-0000-000000000000' // Bu placeholder değer, gerçek uygulamada ilgili kulübün sahibinin ID'si ile değiştirilmelidir
+      req.user.userId // Artık MongoDB ID kullanıldığı için kullanıcının kendi ID'sini kullanabiliriz
     );
   }
 } 

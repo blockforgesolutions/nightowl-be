@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsEnum, IsUUID, IsDateString, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsEnum, IsDateString, Min, IsMongoId } from 'class-validator';
 import { MusicGenre } from '../../clubs/schemas/club.schema';
 import { EventStatus } from '../schemas/event.schema';
 
@@ -36,6 +36,6 @@ export class CreateEventDto {
   @Min(0)
   totalTickets: number;
 
-  @IsUUID()
+  @IsMongoId()
   clubId: string;
 } 
