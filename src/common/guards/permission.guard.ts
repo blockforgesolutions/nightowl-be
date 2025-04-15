@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RoleService } from 'src/role/role.service';
+import { BaseRoles } from '../enums/base-roles.enum';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -23,14 +24,15 @@ export class PermissionsGuard implements CanActivate {
 
         if (!user || !user.role) return false;
 
-        if (user.role === 'super_admin') {
+        if (user.role === BaseRoles.SUPER_ADMIN) {
             return true;
+        } else {
+            const role = await this.roleService.getRoleByName(user.role);
+            console.log(role);
+
+            const userPermissions: string[] = role.privileges.map(p => p.action);
+
+            return userPermissions.includes(requiredPermission);
         }
-
-        const role = await this.roleService.getRoleByName(user.role);
-
-        const userPermissions: string[] = role.privileges.map(p => p.action);
-
-        return userPermissions.includes(requiredPermission);
     }
 }
