@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { OrderModel } from './order.model';
+import { OrderModel } from './order.schema';
 import { Model } from 'mongoose';
 import { CreateOrderDto } from './dto/createOrder.dto';
 import { ItemDto } from './dto/item.dto';

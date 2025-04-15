@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CategoryModel } from './category.model';
+import { CategoryModel } from './category.schema';
 import { CategoryDto } from './dto/category.dto';
 import { Model } from 'mongoose';
 import { CategoryRespone } from './model/category.respone';

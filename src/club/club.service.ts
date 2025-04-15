@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateClubDto } from './dto/create-club.dto';
-import { ClubModel } from './club.model';
+import { ClubModel } from './club.schema';
 import { ClubResponse } from './model/club.response';
 import { transformMongoData } from 'src/common/utils/transform.utils';
 import { transformMongoArray } from 'src/common/utils/mongo.utils';
