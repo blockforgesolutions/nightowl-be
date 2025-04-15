@@ -52,6 +52,9 @@ export class EventResponse {
     @ApiProperty({ example: 150 })
     capacity: number;
 
+    @ApiProperty({ example: 150.00 })
+    price: number;
+
     @ApiProperty({
         type: Club, 
         example: {

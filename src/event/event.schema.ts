@@ -20,6 +20,9 @@ export class EventModel extends Document implements Event {
 
     @Prop({ required: true })
     capacity: number;
+    
+    @Prop({ required: true })
+    price: number;
 
     @Prop({ default: 0 })
     ticketsSold: number;

@@ -6,6 +6,7 @@ export interface Event {
     date: Date
     location:string,
     capacity: number
+    price: number
     ticketsSold: number
     club: Schema.Types.ObjectId
     tickets: Schema.Types.ObjectId[]

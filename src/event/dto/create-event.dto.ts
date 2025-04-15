@@ -30,6 +30,11 @@ export class CreateEventDto {
     @IsNotEmpty()
     capacity: number;
 
+    @ApiProperty({ example: 150.00 })
+    @IsNumber()
+    @IsNotEmpty()
+    price: number;
+
     @ApiProperty({ example: "67ec0cdc464f9688663f1700" })
     @IsMongoId()
     @IsNotEmpty()
