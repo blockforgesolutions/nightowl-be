@@ -12,7 +12,7 @@ import { PermissionAction } from 'src/common/enums/permission.enum';
 
 @Controller('category')
 @ApiTags('Category')
-@ApiSecurity('Bearer')
+@ApiSecurity('bearer')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class CategoryController {
     constructor(

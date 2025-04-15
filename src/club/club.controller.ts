@@ -14,7 +14,7 @@ import { PermissionAction } from 'src/common/enums/permission.enum';
 
 @Controller('club')
 @ApiTags('Club')
-@ApiSecurity('Bearer')
+@ApiSecurity('bearer')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ClubController {
     constructor(
