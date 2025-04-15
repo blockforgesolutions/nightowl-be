@@ -16,6 +16,7 @@ import { RegionModule } from './region/region.module';
 import { PrivilegesModule } from './privileges/privileges.module';
 import { EventModule } from './event/event.module';
 import { TicketModule } from './ticket/ticket.module';
+import { QrCodeModule } from './qr-code/qr-code.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { TicketModule } from './ticket/ticket.module';
     PrivilegesModule,
     EventModule,
     TicketModule,
+    QrCodeModule,
     
   ],
   controllers: [AppController],

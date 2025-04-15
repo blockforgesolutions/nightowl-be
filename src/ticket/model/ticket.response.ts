@@ -1,20 +1,54 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { Schema } from "mongoose"
+
+class User {
+    @ApiProperty({ example: '67ec0cdc464f9688663f1700' })
+    readonly id: string
+
+    @ApiProperty({ example: 'John Doe' })
+    readonly fullName: string
+
+    @ApiProperty({ example: 'johndoe@gmail.com' })
+    readonly email: string
+
+}
+
+class Event {
+    @ApiProperty({ example: '67ec0cdc464f9688663f1700' })
+    readonly id: string
+
+    @ApiProperty({ example: 'Event Title' })
+    readonly title: string
+
+    @ApiProperty({ example: "Event Description" })
+    description: string;
+
+    @ApiProperty({ example: "2022-01-01T00:00:00.000Z" })
+    date: Date;
+
+    @ApiProperty({ example: "Event Location" })
+    location: string;
+
+    @ApiProperty({ example: 150 })
+    capacity: number;
+
+    @ApiProperty({ example: 150.00 })
+    price: number;
+}
 
 export class TicketResponse {
     @ApiProperty({ example: '67ec0cdc464f9688663f1700' })
     readonly id: string
 
-    @ApiProperty({ example: '67ec0cdc464f9688663f1700' })
-    readonly userId: Schema.Types.ObjectId
+    @ApiProperty({ type: User })
+    readonly user: User 
 
-    @ApiProperty({ example: '67ec0cdc464f9688663f1700' })
-    readonly eventId: Schema.Types.ObjectId
+    @ApiProperty({ type: Event })
+    readonly event: Event
 
-    @ApiProperty({ example: '67ec0cdc464f9688663f1700' })
-    readonly orderId: Schema.Types.ObjectId
+    @ApiProperty({ example: 'TmljQGolbnonKDpYZUNFLjRLRyQ0VT9WalRvJVhPNHdnQUcnXVpySkJpanRyJGI=' })
+    readonly sessionId: string
 
-    @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ' })
+    @ApiProperty({ example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASQAAAEkCAYAAACG+UzsAAAAAklEQVR4AewaftIAABSeSURBVO3BQW7s2pLAQFL' })
     readonly qrCodeData: string
 
     @ApiProperty({ example: false })

@@ -69,8 +69,36 @@ export class TicketController {
         status: 404,
         description: TicketMessage.NOT_FOUND,
     })
-    async getTicketById(@Param('ticketId') ticketId: string): Promise<TicketResponse> {
+    async getTicketById(@Param('ticketId') ticketId: string) {
         return await this.ticketService.getTicketById(ticketId);
+    }
+
+    @Get('/by-session/:sessionId')
+    @RequirePermission('ticket', PermissionAction.READ)
+    @ApiOperation({ summary: 'Get Ticket', description: 'Returns the ticket' })
+    @ApiResponse({
+        status: 200,
+        description: TicketMessage.GET_Ticket,
+        type: TicketResponse
+    })
+    @ApiResponse({
+        status: 400,
+        description: CommonMessage.INVALID_CREDENTIALS
+    })
+    @ApiResponse({
+        status: 401,
+        description: CommonMessage.INVALID_CREDENTIALS,
+    })
+    @ApiResponse({
+        status: 403,
+        description: CommonMessage.INVALID_CREDENTIALS,
+    })
+    @ApiResponse({
+        status: 404,
+        description: TicketMessage.NOT_FOUND,
+    })
+    async getTicketBySession(@Param('sessionId') sessionId: string) {
+        return await this.ticketService.getTicketBySession(sessionId);
     }
 
     @Put(':ticketId')
