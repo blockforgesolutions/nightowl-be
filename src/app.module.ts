@@ -14,6 +14,7 @@ import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
 import { RegionModule } from './region/region.module';
 import { PrivilegesModule } from './privileges/privileges.module';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { PrivilegesModule } from './privileges/privileges.module';
     ProductModule,
     RegionModule,
     PrivilegesModule,
+    EventModule,
     
   ],
   controllers: [AppController],
