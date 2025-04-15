@@ -18,7 +18,7 @@ export class ProductService {
     async createProduct(product: CreateProductDto): Promise<ProductResponse> {
         const newProduct = await this.productModel.create(product);
 
-        const transformedProduct = transformMongoData(newProduct, ProductResponse);
+        const transformedProduct = transformMongoData(newProduct.toObject(), ProductResponse);
         return transformedProduct;
     }
 

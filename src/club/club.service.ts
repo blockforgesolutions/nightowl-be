@@ -18,7 +18,7 @@ export class ClubService {
     async createClub(createClubDto: CreateClubDto): Promise<ClubResponse> {
         const newClub = await this.clubModel.create(createClubDto);
 
-        const trasformedClub = transformMongoData(newClub, ClubResponse);
+        const trasformedClub = transformMongoData(newClub.toObject(), ClubResponse);
 
         return trasformedClub;
     }

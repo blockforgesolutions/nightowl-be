@@ -18,7 +18,7 @@ export class RegionService {
     async createRegion(createRegionDto: CreateRegionDto): Promise<RegionResponse> {
         const newRegion = await this.regionModel.create(createRegionDto);
 
-        const transformedRegion = transformMongoData(newRegion, RegionResponse);
+        const transformedRegion = transformMongoData(newRegion.toObject(), RegionResponse);
 
         return transformedRegion
     }

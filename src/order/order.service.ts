@@ -18,7 +18,7 @@ export class OrderService {
     async createOrder(order: CreateOrderDto): Promise<OrderResponse> {
         const newOrder = await this.orderModel.create(order);
 
-        const transformedOrder = transformMongoData(newOrder, OrderResponse);
+        const transformedOrder = transformMongoData(newOrder.toObject(), OrderResponse);
 
         return transformedOrder;
     }

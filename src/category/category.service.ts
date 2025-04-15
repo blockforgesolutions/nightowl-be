@@ -17,7 +17,7 @@ export class CategoryService {
     async createCategory(categoryDto: CategoryDto): Promise<CategoryRespone> {
         const newCategory = await this.categoryModel.create(categoryDto);
 
-        const tranformedCategory = transformMongoData(newCategory, CategoryRespone);
+        const tranformedCategory = transformMongoData(newCategory.toObject(), CategoryRespone);
 
         return tranformedCategory
     }
