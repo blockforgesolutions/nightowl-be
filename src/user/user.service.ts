@@ -52,6 +52,7 @@ export class UserService {
 
     async getUserById(id: string): Promise<UserResponse> {
         const user = await this.userModel.findById(id);
+           
 
         if (!user) {
             throw new HttpException(UserMessages.NOT_FOUND, HttpStatus.NOT_FOUND)
@@ -104,10 +105,16 @@ export class UserService {
         const populatedUser = await this.userModel
             .findById(user._id)
             .select('-password')
-            .populate({
-                path: 'role',
-                select: '_id name'
-            })
+            .populate([
+                {
+                    path: 'role',
+                    select: '_id name'
+                },
+                {
+                    path:'club',
+                    select: 'id name country city district neighborhood street no address zipCode'
+                }
+            ])
             .lean();
 
         if (!populatedUser || !populatedUser.role) {

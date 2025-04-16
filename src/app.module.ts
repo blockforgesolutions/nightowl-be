@@ -17,6 +17,7 @@ import { PrivilegesModule } from './privileges/privileges.module';
 import { EventModule } from './event/event.module';
 import { TicketModule } from './ticket/ticket.module';
 import { QrCodeModule } from './qr-code/qr-code.module';
+import { PrivilegeInitializer } from './scripts/privilege.script';
 
 @Module({
   imports: [
@@ -44,6 +45,6 @@ import { QrCodeModule } from './qr-code/qr-code.module';
     
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrivilegeInitializer],
 })
 export class AppModule { }

@@ -6,4 +6,5 @@ export enum TicketMessage {
     DELETED = 'Ticket deleted successfully',
     GET_ALL_TicketS = 'Get all Tickets successfully',
     GET_Ticket = 'Get Ticket successfully',
+    ALREADY_USED = 'Ticket already used'
 }

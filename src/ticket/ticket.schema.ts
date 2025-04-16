@@ -18,6 +18,9 @@ export class TicketModel extends Document {
   @Prop({ required: true })
   qrCodeData: string;
 
+  @Prop({ required: true })
+  qrToken: string;
+
   @Prop({ default: false })
   used: boolean;
 

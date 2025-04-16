@@ -11,6 +11,7 @@ import { RoleModule } from 'src/role/role.module';
     MongooseModule.forFeature([{ name: PrivilegeModel.name, schema: PrivilegeSchema }])
   ],
   providers: [PrivilegesService],
-  controllers: [PrivilegesController]
+  controllers: [PrivilegesController],
+  exports: [PrivilegesService]
 })
 export class PrivilegesModule { }

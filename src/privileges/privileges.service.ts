@@ -15,6 +15,12 @@ export class PrivilegesService {
     ) { }
 
     async createPrivilege(userId:string, privilege: PrivilegeDto): Promise<PrivilegeResponse> {
+        const isPrivilegeExist = await this.privilegeModel.findOne({ name: privilege.name }).lean();
+        
+        if (isPrivilegeExist) {
+            throw new HttpException(PrivilegeMessage.ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
+        }
+
         const createdPrivilege = await this.privilegeModel.create({ ...privilege, createdBy: userId });
         const transformedPrivilege = transformMongoData(createdPrivilege.toObject(), PrivilegeResponse);
         return transformedPrivilege;

@@ -1,9 +1,8 @@
 import { Schema } from "mongoose"
-import { PermissionAction } from "../../common/enums/permission.enum"
 
 export interface Privilege {
     name: string,
     description: string
-    action: PermissionAction
+    action: string
     createdBy: Schema.Types.ObjectId
 }

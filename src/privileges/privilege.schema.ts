@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema } from 'mongoose'
 import { Privilege } from "./interface/privilege.interface";
-import { PermissionAction } from "../common/enums/permission.enum";
 
 export type PrivilegeDocument = Privilege & Document
 
@@ -9,6 +8,7 @@ export type PrivilegeDocument = Privilege & Document
 export class PrivilegeModel extends Document implements Privilege {
     @Prop({
         required: true,
+        unique:true
     })
     name: string;
 
@@ -17,8 +17,8 @@ export class PrivilegeModel extends Document implements Privilege {
     })
     description: string;
 
-    @Prop({ required: true, enum: PermissionAction })
-    action: PermissionAction;
+    @Prop({ required: true  })
+    action: string;
 
     @Prop({ required: true, ref:'UserModel'})
     createdBy: MongooseSchema.Types.ObjectId;

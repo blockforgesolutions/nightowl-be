@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { ApiOperation, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { PermissionsGuard } from 'src/common/guards/permission.guard';
 import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
@@ -99,6 +99,35 @@ export class TicketController {
     })
     async getTicketBySession(@Param('sessionId') sessionId: string) {
         return await this.ticketService.getTicketBySession(sessionId);
+    }
+
+    @Post('/verify-ticket')
+    @RequirePermission('ticket', PermissionAction.READ)
+    @ApiOperation({ summary: 'Get Ticket', description: 'Returns the ticket' })
+    @ApiQuery({ name: 'token', required: true })
+    @ApiResponse({
+        status: 200,
+        description: TicketMessage.GET_Ticket,
+        type: TicketResponse
+    })
+    @ApiResponse({
+        status: 400,
+        description: CommonMessage.INVALID_CREDENTIALS
+    })
+    @ApiResponse({
+        status: 401,
+        description: CommonMessage.INVALID_CREDENTIALS,
+    })
+    @ApiResponse({
+        status: 403,
+        description: CommonMessage.INVALID_CREDENTIALS,
+    })
+    @ApiResponse({
+        status: 404,
+        description: TicketMessage.NOT_FOUND,
+    })
+    async verifyTicket(@Query('token') token: string) {
+        return await this.ticketService.verifyTicket(token);
     }
 
     @Put(':ticketId')
