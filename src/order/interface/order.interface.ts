@@ -6,9 +6,9 @@ export interface Items {
 }
 
 export enum PaymentType {
-    CASH = "nakit",
-    CREDIT_CARD = "kredi kartı",
-    UNKNOWN = "bilinmiyor"
+    CASH = "cash",
+    CREDIT_CARD = "credit-card",
+    UNKNOWN = "unknown"
 }
 
 export interface Order {
