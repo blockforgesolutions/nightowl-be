@@ -7,6 +7,8 @@ import { isValidPassword } from 'src/utils/jwt.util';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { RoleService } from 'src/role/role.service';
 import { AuthResponse } from './model/auth.response';
+import { EmployeeService } from 'src/employee/employee.service';
+import { CreateEmployeeDto } from 'src/employee/dto/createEmployee.dto';
 
 
 
@@ -14,6 +16,7 @@ import { AuthResponse } from './model/auth.response';
 export class AuthService {
     constructor(
         private readonly userService: UserService,
+        private readonly employeeService: EmployeeService,
         private readonly roleService: RoleService,
         private readonly jwtService: JwtService,
         private config: ConfigService
@@ -47,6 +50,33 @@ export class AuthService {
         const role = await this.roleService.getRoleById(String(user.role));
 
         const tokens = await this.getTokens(String(user.id), role.name);
+
+        return tokens;
+    }
+
+    async employeeLogin(login: LoginDto): Promise<AuthResponse> {
+        const employee = await this.employeeService.getEmployeeByEmail(login.email);
+
+        const isMatch = await isValidPassword(login.password, employee.password);
+        if (!isMatch) {
+            throw new HttpException('Username or password does not match', HttpStatus.UNAUTHORIZED);
+        }
+
+        const role = await this.roleService.getRoleById(String(employee.role));
+
+        employee.lastEntry = new Date();
+        await employee.save();
+
+        const token = await this.getTokens(String(employee._id), role.name)
+        return token;
+    }
+
+    async registerEmployee(registerDto: CreateEmployeeDto): Promise<AuthResponse> {
+        const employee = await this.employeeService.createEmployee(registerDto);
+
+        const role = await this.roleService.getRoleById(String(employee.role));
+
+        const tokens = await this.getTokens(String(employee.id), role.name);
 
         return tokens;
     }

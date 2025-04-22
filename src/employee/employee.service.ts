@@ -49,14 +49,14 @@ export class EmployeeService {
         return await this.mapToEmployeeResponse(employee);
     }
 
-    async getEmployeeByEmail(email: string): Promise<EmployeeResponse> {
-        const employee = await this.employeeModel.findOne({ email: email });
+    async getEmployeeByEmail(email: string): Promise<EmployeeModel> {
+        const employee = await this.employeeModel.findOne({ email: email }).lean();
 
         if (!employee) {
             throw new HttpException(EmployeeMessages.NOT_FOUND, HttpStatus.NOT_FOUND)
         }
 
-        return await this.mapToEmployeeResponse(employee);
+        return employee
     }
 
     async updateEmployee(employeeId: string, updateEmployeeDto: UpdateEmployeeDto): Promise<EmployeeResponse> {

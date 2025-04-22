@@ -35,6 +35,27 @@ export class AuthController {
         return tokens
     }
 
+    @Post('employeeLogin')
+    @ApiOperation({ summary: "Sign in with email and password" })
+    @ApiResponse({ status: 200, description: AuthMessages.LOGIN_SUCCESS, type: AuthResponse })
+    @ApiResponse({ status: 401, description: AuthMessages.INVALID_CREDENTIALS })
+    async employeeLogin(@Res({ passthrough: true }) res: Response, @Body() loginDto: LoginDto) {
+        const tokens = await this.authService.employeeLogin(loginDto);
+        // res.cookie('accessToken', tokens.access_token, {
+        //     httpOnly: true,
+        //     secure: false,
+        //     sameSite: 'strict',
+        //     // maxAge: 15 * 60 * 1000
+        // });
+        // res.cookie('refreshToken', tokens.refresh_token, {
+        //     httpOnly: true,
+        //     secure: false,
+        //     sameSite: 'strict',
+        //     // maxAge: 7 * 24 * 60 * 60 * 1000 
+        // });
+        return tokens
+    }
+
     @Post('register')
     @ApiOperation({ summary: "Sign up with email and password" })
     @ApiResponse({ status: 201, description: AuthMessages.USER_CREATED_SUCCESS, type: AuthResponse })

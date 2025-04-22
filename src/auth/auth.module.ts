@@ -8,10 +8,12 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 import { RoleModule } from 'src/role/role.module';
+import { EmployeeModule } from 'src/employee/employee.module';
 
 @Module({
   imports: [
     UserModule,
+    EmployeeModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'defaultSecretKey',
