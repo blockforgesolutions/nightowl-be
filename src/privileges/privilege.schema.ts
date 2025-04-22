@@ -20,7 +20,7 @@ export class PrivilegeModel extends Document implements Privilege {
     @Prop({ required: true  })
     action: string;
 
-    @Prop({ required: true, ref:'UserModel'})
+    @Prop({ required: true, ref:'EmployeeModel'})
     createdBy: MongooseSchema.Types.ObjectId;
 }
 

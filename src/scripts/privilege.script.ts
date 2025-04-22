@@ -18,12 +18,13 @@ export class PrivilegeInitializer implements OnModuleInit {
     'role',
     'ticket',
     'user',
+    'employee'
   ];
 
   private readonly actions = ['create', 'read', 'update', 'delete'];
   private readonly createdBy = '67fbb3a11420f5cb2f997780';
 
-  constructor(private readonly privilegeService: PrivilegesService) {}
+  constructor(private readonly privilegeService: PrivilegesService) { }
 
   async onModuleInit() {
     await this.initializePrivileges();
@@ -33,7 +34,7 @@ export class PrivilegeInitializer implements OnModuleInit {
     try {
       const privileges = await this.privilegeService.getPrivileges();
 
-      if(privileges.length === this.models.length * this.actions.length) {
+      if (privileges.length === this.models.length * this.actions.length) {
         console.log('Privileges already initialized');
       } else {
         for (const model of this.models) {
@@ -41,18 +42,27 @@ export class PrivilegeInitializer implements OnModuleInit {
             const name = `${action}-${model}`;
             const actionName = `${model}:${action}`;
             const description = `${this.capitalizeFirstLetter(action)} ${model}`;
-  
-            await this.privilegeService.createPrivilege(this.createdBy, {
-              name,
-              description,
-              action: actionName as PermissionAction,
-            });
+
+            try {
+              await this.privilegeService.createPrivilege(this.createdBy, {
+                name,
+                description,
+                action: actionName as PermissionAction,
+              });
+            } catch (err: any) {
+              if (err.message?.includes('already exists')) {
+                console.warn(`Privilege ${name} already exists, skipping...`);
+                continue;
+              } else {
+                throw err;
+              }
+            }
           }
         }
         console.log('All privileges initialized successfully');
       }
 
-      
+
     } catch (error) {
       console.error('Error initializing privileges:', error);
     }

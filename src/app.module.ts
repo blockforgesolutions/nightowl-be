@@ -18,6 +18,7 @@ import { EventModule } from './event/event.module';
 import { TicketModule } from './ticket/ticket.module';
 import { QrCodeModule } from './qr-code/qr-code.module';
 import { PrivilegeInitializer } from './scripts/privilege.script';
+import { EmployeeModule } from './employee/employee.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { PrivilegeInitializer } from './scripts/privilege.script';
     EventModule,
     TicketModule,
     QrCodeModule,
+    EmployeeModule,
     
   ],
   controllers: [AppController],
