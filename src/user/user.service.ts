@@ -110,10 +110,6 @@ export class UserService {
                     path: 'role',
                     select: '_id name'
                 },
-                {
-                    path:'club',
-                    select: 'id name country city district neighborhood street no address zipCode'
-                }
             ])
             .lean();
 

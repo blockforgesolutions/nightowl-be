@@ -38,12 +38,6 @@ export class UserModel extends Document implements User {
     
     @Prop()
     lastExit?: Date;
-
-    @Prop({
-        ref:'ClubModel',
-        required: true
-    })
-    club: MongooseSchema.Types.ObjectId
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel)

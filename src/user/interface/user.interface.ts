@@ -9,5 +9,4 @@ export interface User {
     role: Schema.Types.ObjectId,
     lastEntry?: Date
     lastExit?: Date,
-    club: Schema.Types.ObjectId
 }
