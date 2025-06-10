@@ -19,6 +19,7 @@ import { TicketModule } from './ticket/ticket.module';
 import { QrCodeModule } from './qr-code/qr-code.module';
 import { PrivilegeInitializer } from './scripts/privilege.script';
 import { EmployeeModule } from './employee/employee.module';
+// import { PrivilegeAssignerScript } from './scripts/assing-privileges.script';
 
 @Module({
   imports: [
@@ -44,7 +45,7 @@ import { EmployeeModule } from './employee/employee.module';
     TicketModule,
     QrCodeModule,
     EmployeeModule,
-    
+
   ],
   controllers: [AppController],
   providers: [AppService, PrivilegeInitializer],
