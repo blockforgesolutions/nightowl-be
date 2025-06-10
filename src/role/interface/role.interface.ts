@@ -1,7 +1,6 @@
-import { Privilege } from "src/privileges/interface/privilege.interface";
-
+import { Types } from "mongoose";
 
 export interface Role {
     name: string,
-    privileges: Privilege[]
+    privileges: Types.ObjectId[]
 }

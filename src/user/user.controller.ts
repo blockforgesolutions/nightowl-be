@@ -9,6 +9,8 @@ import { PermissionAction } from 'src/common/enums/permission.enum';
 import { UserResponse } from './model/user.response';
 import { CommonMessage } from 'src/common/enums/response/common-message.enum';
 import { UserMessages } from './enums/user.enum';
+import { User as UserDecorator } from '../common/decorators/user.decorator';
+
 
 @Controller('user')
 @ApiTags('User')
@@ -27,6 +29,20 @@ export class UserController {
 
     //     return new ApiResponseDto(true, user)
     // }
+
+    @Get('current')
+    @ApiOperation({ summary: 'Get current user', description: 'Returns the authenticated user\'s information' })
+    @ApiResponse({
+        status: 200,
+        description: 'Returns current user information',
+        type: UserResponse
+    })
+    @ApiResponse({ status: 401, description: CommonMessage.UNAUTHORIZED_ACCESS })
+    @ApiResponse({ status: 403, description: CommonMessage.UNAUTHORIZED_ACCESS })
+    @ApiResponse({ status: 404, description: UserMessages.NOT_FOUND })
+    getCurrent(@UserDecorator('id') id: string): Promise<UserResponse> {
+        return this.userService.getUserById(id);
+    }
 
     @Get()
     @RequirePermission('user', PermissionAction.READ)

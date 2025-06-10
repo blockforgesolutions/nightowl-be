@@ -28,7 +28,6 @@ export class PermissionsGuard implements CanActivate {
             return true;
         } else {
             const role = await this.roleService.getRoleByName(user.role);
-            console.log(role);
 
             const userPermissions: string[] = role.privileges.map(p => p.action);
 
