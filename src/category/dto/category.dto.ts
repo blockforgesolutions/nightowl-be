@@ -16,5 +16,5 @@ export class CategoryDto {
     @ApiProperty({example:'67ec0cdc464f9688663f1700'})
     @IsString()
     @IsNotEmpty()
-    company: Types.ObjectId
+    club: Types.ObjectId
 }
