@@ -9,6 +9,9 @@ import { JwtStrategy } from './jwt/jwt.strategy';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 import { RoleModule } from 'src/role/role.module';
 import { EmployeeModule } from 'src/employee/employee.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserModel, UserSchema } from 'src/user/user.schema';
+import { EmployeeModel, EmployeeSchema } from 'src/employee/employee.schema';
 
 @Module({
   imports: [
@@ -19,6 +22,8 @@ import { EmployeeModule } from 'src/employee/employee.module';
       secret: process.env.JWT_SECRET || 'defaultSecretKey',
       signOptions: { expiresIn: '3600s' },
     }),
+    MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: EmployeeModel.name, schema: EmployeeSchema }]),
     ConfigModule,
     RoleModule
   ],

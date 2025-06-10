@@ -1,13 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { UserResponse } from "src/user/model/user.response"
+import { EmployeeResponse } from "src/employee/model/employee.response"
 
-export class AuthResponse {
+export class EmployeeAuthResponse {
     @ApiProperty({ example:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' })
     access_token: string
 
     @ApiProperty({ example:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' })
     refresh_token: string
 
-    @ApiProperty({type: UserResponse})
-    user: UserResponse
+    @ApiProperty({type: EmployeeResponse})
+    employee: EmployeeResponse
 }
