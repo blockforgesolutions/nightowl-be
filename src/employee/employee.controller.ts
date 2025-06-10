@@ -10,11 +10,13 @@ import { EmployeeMessages } from './enums/employee.enum';
 import { EmployeeResponse } from './model/employee.response';
 import { CommonMessage } from 'src/common/enums/response/common-message.enum';
 import { UpdateEmployeeDto } from './dto/updateEmployee.dto';
+import { User as UserDecorator } from '../common/decorators/user.decorator';
+
 
 @Controller('employee')
 @ApiTags('Employee')
 @ApiSecurity('bearer')
-@UseGuards(JwtAuthGuard, PermissionsGuard)
+@UseGuards(JwtAuthGuard)
 export class EmployeeController {
     constructor(
         private readonly employeeService: EmployeeService
@@ -64,6 +66,21 @@ export class EmployeeController {
         return await this.employeeService.getClubEmployees(clubId);
     }
 
+
+    @Get('current')
+    @ApiOperation({ summary: 'Get current user', description: 'Returns the authenticated user\'s information' })
+    @ApiResponse({
+        status: 200,
+        description: 'Returns current user information',
+        type: EmployeeResponse
+    })
+    @ApiResponse({ status: 401, description: CommonMessage.UNAUTHORIZED_ACCESS })
+    @ApiResponse({ status: 403, description: CommonMessage.UNAUTHORIZED_ACCESS })
+    @ApiResponse({ status: 404, description: EmployeeMessages.NOT_FOUND })
+    getCurrent(@UserDecorator('sub') id: string): Promise<EmployeeResponse> {
+        return this.employeeService.getEmployeeById(id);
+    }
+
     @Get(':employeeId')
     @RequirePermission('employee', PermissionAction.READ)
     @ApiOperation({ summary: 'Get employee', description: 'Returns the employee' })
@@ -87,6 +104,7 @@ export class EmployeeController {
     async getEmployeeById(@Param('employeeId') employeeId: string) {
         return await this.employeeService.getEmployeeById(employeeId);
     }
+
 
     @Get('/email')
     @RequirePermission('employee', PermissionAction.READ)
