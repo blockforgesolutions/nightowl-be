@@ -51,7 +51,9 @@ export class UserService {
     }
 
     async getUserById(id: string): Promise<UserResponse> {
-        const user = await this.userModel.findById(id);
+        const user = await this.userModel.findById(id)
+        .select('-password')
+        .lean();
            
 
         if (!user) {
@@ -62,7 +64,7 @@ export class UserService {
     }
 
     async getUserByEmail(email: string): Promise<UserModel> {
-        const user = await this.userModel.findOne({ email: email })
+        const user = await this.userModel.findOne({ email: email });
 
         if (!user) {
             throw new HttpException(UserMessages.NOT_FOUND, HttpStatus.NOT_FOUND)
@@ -73,6 +75,8 @@ export class UserService {
 
     async getUserByPhoneNumber(phoneNumber: string): Promise<UserResponse> {
         const user = await this.userModel.findOne({ phoneNumber: phoneNumber })
+        .select('-password')
+        .lean();
 
         if (!user) {
             throw new HttpException(UserMessages.NOT_FOUND, HttpStatus.NOT_FOUND)
@@ -82,7 +86,10 @@ export class UserService {
     }
 
     async updateUser(userId: string, updateUserDto: UpdateUserDto): Promise<UserResponse> {
-        const user = await this.userModel.findByIdAndUpdate(userId, updateUserDto, { new: true });
+        const user = await this.userModel.findByIdAndUpdate(userId, updateUserDto, { new: true })
+        .select('-password')
+        .lean();
+
         if (!user) {
             throw new HttpException(UserMessages.NOT_FOUND, HttpStatus.NOT_FOUND)
         }
