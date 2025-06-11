@@ -15,10 +15,10 @@ export class ProductModel extends Document implements Product {
     @Prop({ required: true })
     unit: string;
 
-    @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'Category' })
+    @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'CategoryModel' })
     category: MongooseSchema.Types.ObjectId;
 
-    @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'Club' })
+    @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'ClubModel' })
     club: MongooseSchema.Types.ObjectId;
 }
 

@@ -43,8 +43,7 @@ export class CategoryService {
     }
 
     async updateCategory(categoryId: string, categoryDto: CategoryDto): Promise<CategoryRespone> {
-        const category = await this.categoryModel.findByIdAndUpdate(categoryId, categoryDto, { new: true });
-
+        const category = await this.categoryModel.findByIdAndUpdate(categoryId, categoryDto, { new: true }).lean();
         if (!category) {
             throw new HttpException(CategoryMessage.NOT_FOUND, HttpStatus.NOT_FOUND)
         }
