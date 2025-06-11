@@ -43,7 +43,10 @@ export class ProductService {
     }
 
     async getProductsByCategory(category: string): Promise<ProductResponse[]> {
-        const products = await this.productModel.find({ category: category });
+        const products = await this.productModel.find({ category: category })
+        .populate('category')
+        .populate('club')
+        .lean();
 
         const transformedProducts = transformMongoArray<ProductModel, ProductResponse>(products);
 
